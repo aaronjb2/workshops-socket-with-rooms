@@ -16,6 +16,20 @@ io.on("connection", socket => {
     //io.emit will broadcast the message to all users
     io.emit("message-received", data);
   });
+
+  socket.on("join-room", data => {
+    socket.join(data.room);
+    io.to(data.room).emit("room-message-received", {
+      message: `new user to room ${data.room}`
+    });
+  });
+
+  socket.on("send-room-message", data => {
+    io.to(data.room).emit("send-room-message-received", {
+      message: `${data.name} says: ${data.message}`
+    });
+  });
+
   io.on("disconnect", () => {
     console.log("he out");
   });
