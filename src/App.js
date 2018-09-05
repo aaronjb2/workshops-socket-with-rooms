@@ -124,7 +124,7 @@ class App extends Component {
             </div>
           )}
         </div>
-
+        {/* This is a comment for reasons */}
         {/* Room Chat */}
         <div className="chat-box">
           {this.state.roomMessages.map((val, i) => {
