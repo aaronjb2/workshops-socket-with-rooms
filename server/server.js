@@ -12,8 +12,9 @@ io.on("connection", socket => {
 
   socket.on("join-chat", data => {
     // The Broadcast flag will send to all sockets except the one that sent the message
-    socket.broadcast.emit("joined-chat", data.name);
+    socket.broadcast.emit("all-users", data.name);
   });
+
   socket.on("send-message", data => {
     //io.emit will broadcast the message to all users
     io.emit("message-received", data);

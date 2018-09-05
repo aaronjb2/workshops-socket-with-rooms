@@ -2,6 +2,16 @@ import React, { Component } from "react";
 import "./App.css";
 import io from "socket.io-client";
 
+// Sockets have traditionally been the solution around which most realtime chat systems are architected,
+// providing a bi-directional communication channel between a client and a server.
+// This means that the server can push messages to clients. Whenever you write a chat message,
+// the idea is that the server will get it and push it to all other connected clients.
+
+//Socket.IO is composed of two parts:
+
+//A server that integrates with (or mounts on) the Node.JS HTTP Server: socket.io
+//A client library that loads on the browser side: socket.io-client
+
 // Need to initially tell the socket what server it will be listening to, when hosted, you'll erase the http://localhost:3007 because the server will be serving static files
 const socket = io.connect("http://localhost:3007");
 
@@ -20,7 +30,7 @@ class App extends Component {
     };
 
     ///////////////////global chat/////////////////////////////////////
-    socket.on("joined-chat", data => {
+    socket.on("all-users", data => {
       this.setState(() => {
         let tempMessages = [...this.state.messages];
         tempMessages.push(`${data} has joined the chat`);
@@ -38,13 +48,13 @@ class App extends Component {
     //////////////////////////////////////////////////////////////////
 
     /////////////////////// room chat /////////////////////////////
+
     socket.on("room-message-received", data => {
-      this.setState(() => {
-        let tempMessages = [...this.state.roomMessages];
-        tempMessages.push(data.message);
-        return { roomMessages: tempMessages };
-      });
+      let tempMessages = [...this.state.roomMessages];
+      tempMessages.push(data.message);
+      this.setState({ roomMessages: tempMessages });
     });
+
     socket.on("send-room-message-received", data => {
       this.setState(() => {
         let tempMessages = [...this.state.roomMessages];
@@ -57,6 +67,7 @@ class App extends Component {
 
   joinChat() {
     this.setState({ joined: true });
+
     socket.emit("join-chat", { name: this.state.name });
   }
 
@@ -69,6 +80,7 @@ class App extends Component {
 
   joinRoom() {
     this.setState({ roomJoined: true });
+
     socket.emit("join-room", { room: this.state.room });
   }
 
@@ -112,6 +124,7 @@ class App extends Component {
             </div>
           )}
         </div>
+
         {/* Room Chat */}
         <div className="chat-box">
           {this.state.roomMessages.map((val, i) => {
