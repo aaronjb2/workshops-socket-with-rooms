@@ -9,11 +9,11 @@
 }
 
 .chat-box {
-  height: 100vh;
-  margin: 5;
+  height: 80vh;
   border: 3px solid black;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
   width: 45%;
+  padding: 50px;
 }

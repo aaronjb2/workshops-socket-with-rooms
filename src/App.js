@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import "./App.css";
 import io from "socket.io-client";
 
+// Need to initially tell the socket what server it will be listening to, when hosted, you'll erase the http://localhost:3007 because the server will be serving static files
 const socket = io.connect("http://localhost:3007");
 
 class App extends Component {
@@ -15,16 +16,10 @@ class App extends Component {
       roomMessage: "",
       messages: [],
       roomMessages: [],
-      room: "",
-      watchers: 0
+      room: ""
     };
-    socket.on("watcher-added", data => {
-      this.setState(() => {
-        let tempMessages = [...this.state.messages];
-        tempMessages.push(`Someone is watching...`);
-        return { messages: tempMessages };
-      });
-    });
+
+    ///////////////////global chat/////////////////////////////////////
     socket.on("joined-chat", data => {
       this.setState(() => {
         let tempMessages = [...this.state.messages];
@@ -40,6 +35,9 @@ class App extends Component {
         return { messages: tempMessages };
       });
     });
+    //////////////////////////////////////////////////////////////////
+
+    /////////////////////// room chat /////////////////////////////
     socket.on("room-message-received", data => {
       this.setState(() => {
         let tempMessages = [...this.state.roomMessages];
@@ -54,6 +52,7 @@ class App extends Component {
         return { roomMessages: tempMessages };
       });
     });
+    ////////////////////////////////////////////////////////////
   }
 
   joinChat() {
@@ -74,6 +73,7 @@ class App extends Component {
   }
 
   sendRoomMessage() {
+    // because we'll be sending it to a specific room, we need to pass what room it will be going to
     socket.emit("send-room-message", {
       name: this.state.name,
       room: this.state.room,
@@ -84,6 +84,7 @@ class App extends Component {
   render() {
     return (
       <div className="App">
+        {/* Global Chat */}
         <div className="chat-box">
           {this.state.messages.map((val, i) => {
             return (
@@ -92,6 +93,7 @@ class App extends Component {
               </div>
             );
           })}
+          {/* Changes input and buttons based on whether they've initially joined */}
           {!this.state.joined ? (
             <div>
               <input
@@ -110,7 +112,7 @@ class App extends Component {
             </div>
           )}
         </div>
-
+        {/* Room Chat */}
         <div className="chat-box">
           {this.state.roomMessages.map((val, i) => {
             return (
@@ -119,6 +121,7 @@ class App extends Component {
               </div>
             );
           })}
+          {/* Changes based on whether they've joined a room or not */}
           {!this.state.roomJoined ? (
             <div>
               <input
